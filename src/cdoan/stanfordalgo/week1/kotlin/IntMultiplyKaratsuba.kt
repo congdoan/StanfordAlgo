@@ -1,27 +1,21 @@
 package cdoan.stanfordalgo.week1.kotlin
 
-import java.math.BigDecimal
+
 import java.math.BigInteger
 
 
-/**
- * Created by co on 14/06/2017.
- */
-
-
 fun main(args: Array<String>) {
-    //val a = 698.bi
-    //val b = 856.bi
     val a = BigInteger("3141592653589793238462643383279502884197169399375105820974944592")
     val b = BigInteger("2718281828459045235360287471352662497757247093699959574966967627")
-    println("$a * $b = ${a * b}")
     val karatsuba = IntMultiplyKaratsuba()
-    println("multiply($a, $b) = ${karatsuba.multiply(a, b)}")
-    println("multiply($a, $b) == $a * $b : ${a * b == karatsuba.multiply(a, b)}")
+    if (a * b != karatsuba.multiply(a, b)) {
+        throw AssertionError("Incorrect!")
+    }
 }
 
 
 class IntMultiplyKaratsuba {
+
     val base = BigInteger.TEN
 
     fun multiply(x: BigInteger, y: BigInteger): BigInteger {
@@ -56,4 +50,5 @@ class IntMultiplyKaratsuba {
         val b_times_c = multiply(b, c)
         return base.pow(n + m) * a_times_c + base.pow(n) * a_times_d + base.pow(m) * b_times_c + b_times_d
     }
+
 }

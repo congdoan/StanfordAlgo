@@ -1,4 +1,4 @@
-package cdoan.stanfordalgo.week1
+package cdoan.stanfordalgo.week1.kotlin
 
 import java.math.BigInteger
 

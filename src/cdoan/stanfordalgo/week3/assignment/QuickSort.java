@@ -39,7 +39,7 @@ public class QuickSort {
     System.out.println("totalNumComparisions MedianOfThreeAsPivot = " + totalNumComparisions);
   }
   
-  /* Utility method for test */
+  /* Utility method for preparing test data */
   private static List<Integer> readIntsFromTextFile(File file) throws IOException {
     List<Integer> list = new ArrayList<>();
     Scanner scanner = new Scanner(file);
@@ -51,6 +51,10 @@ public class QuickSort {
   }
   
   public static <T extends Comparable<T>> long sort(T[] a, PivotingRule rule) {
+    if (a == null) {
+      throw new NullPointerException("The input array is null!");
+    }
+
     return sort(a, 0, a.length - 1, rule);
   }
   

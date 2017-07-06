@@ -13,7 +13,7 @@ import java.util.Random;
 public class DSelectList {
   
   /**
-   * Run quick tests.
+   * Run tests.
    */
   public static void main(String[] args) {
     List<Integer> input = randomIntegerList();
@@ -46,9 +46,12 @@ public class DSelectList {
    * Compute and return k-th smallest element (order statistic).
    */
   public static <T extends Comparable<T>> T kthSmallest(List<T> a, int k) {
+    if (a == null || a.size() == 0) {
+      throw new IllegalArgumentException("null or empty list a");
+    }
     final int n = a.size();
     if (k < 1 || k > n) {
-      throw new IllegalArgumentException("k must be in range 0.." + n);
+      throw new IllegalArgumentException(String.format("k %d out of range 1..%d", k, n));
     }
     return kthSmallest(a, 0, n, k, false);
   }
@@ -59,8 +62,8 @@ public class DSelectList {
    * 
    * 1 ) Compute a garanteed good pivot based on "Median of Medians" idea.
    * 2 ) Partition input array around pivot.
-   * 3a) If pivot is Kth smallest then return it.
-   * 3b) Otherwise, recur either on Left or Right half of pivot depending whether it > or < Kth smallest.
+   * 3a) If pivot is k-th smallest then return it.
+   * 3b) Otherwise, recur either on Left or Right half of pivot depending whether it > or < k-th smallest.
    */
   private static <T extends Comparable<T>> T kthSmallest(List<T> a, int lo, int len, 
                                                          int k, 
@@ -104,8 +107,8 @@ public class DSelectList {
     int finalIndex = partition(a, lo, len, pivot);
     
     /*
-     * 3) If pivot is Kth smallest then return it.
-     *    Otherwise, recur either on Left or Right half of it depending whether it > or < Kth smallest.
+     * 3) If pivot is k-th smallest then return it.
+     *    Otherwise, recur either on Left or Right half of it depending whether it > or < k-th smallest.
      */
     int orderStatistic = finalIndex - lo + 1;
     if (orderStatistic == k) {

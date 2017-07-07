@@ -83,8 +83,7 @@ public class DSelectArray {
     if (len == 1) {
       // Return either "median of medians" pivot or k-th smallest value (unlucky case)
       return a[lo];
-    }
-    
+    }    
     
     /* 
      * 1) Compute "median of medians" pivot
@@ -111,56 +110,35 @@ public class DSelectArray {
     }
     
     /*
-     * 2) Partition the given subarray around pivot
+     * 2) Partition the given subarray around pivot.
+     *    Since pivot's index is unkown we use 3-way partitioning.
+     *    Maintain invariant a[lo..lt-1] < a[lt..gt] = pivot < a[gt+1..hi].
      */
-    int finalIndex = partition(a, lo, len, pivot);   
+    int lt = lo;
+    int gt = lo + len - 1;
+    for (int i = lo; i <= gt;) {
+      if (less(a[i], pivot)) {
+        swap(a, lt++, i++);
+      } else if (less(pivot, a[i])) {
+        swap(a, i, gt--);
+      } else {
+        i++;
+      }
+    }
     
     /*
-     * 3) If pivot is k-th smallest then return it.
-     *    Otherwise, recur either on Left or Right half of it depending whether it > or < k-th smallest.
+     * 3) If k-th smallest is in pivot's range a[lt..gt] then return it.
+     *    Otherwise, recur either on Left or Right half of its range.
      */
-    int orderStatistic = finalIndex - lo + 1;
-    if (orderStatistic == k) {
+    int orderStatisticLo = lt - lo + 1;
+    int orderStatisticHi = gt - lo + 1;
+    if (orderStatisticLo <= k && k <= orderStatisticHi) {
       return pivot;
     }
-    if (orderStatistic > k) {
-      return kthSmallest(a, lo, orderStatistic - 1, k, medians, false);
+    if (orderStatisticLo > k) {
+      return kthSmallest(a, lo, orderStatisticLo - 1, k, medians, false);
     }    
-    return kthSmallest(a, finalIndex + 1, len - orderStatistic, k - orderStatistic, medians, false);
-  }
-  
-  /*
-   * Helper method to partition sublist a[lo..lo+len-1] around pivot
-   * Invariant: left <= pivot <= right
-   * Return the final index of pivot
-   */
-  private static <T extends Comparable<T>> int partition(T[] a, int lo, int len, T pivot) {
-    /* Find index of pivot and swap it with entry at index lo */
-    for (int i = lo; i < lo + len; i++) {
-      if (pivot.equals(a[i])) {
-        swap(a, lo, i);
-        break;
-      }
-    }
-    
-    int i = lo + 1;
-    int j = lo + len - 1;
-    while (i <= j) {
-      while (i <= j && less(a[i], pivot)) {
-        i++;
-      }
-      //while (i <= j && less(pivot, a[j])) {
-      while (less(pivot, a[j])) { //'i <= j' is unnecessary because a[lo] is itself pivot
-        j--;
-      }
-      if (i <= j) { //Notice: finally i must be greater than j for the loop to terminate
-        swap(a, i, j);
-        i++;
-        j--;
-      }
-    }
-    swap(a, lo, j);
-    return j;
+    return kthSmallest(a, gt + 1, len - orderStatisticHi, k - orderStatisticHi, medians, false);
   }
   
   /* Helper method to check if v < w */

@@ -51,8 +51,9 @@ public class RSelect {
       throw new IllegalArgumentException(String.format("k %d out of range 1..%d", k, n));
     }
 
-    //PartitionStrategy strategy = new ThreewayPartition();
-    PartitionStrategy strategy = new TwowayPartition();
+    //PartitionStrategy strategy = new TwowayPartition();
+    //PartitionStrategy strategy = new TwowayVariantPartition();
+    PartitionStrategy strategy = new ThreewayPartition();
     return kthSmallest(a, 0, n, k, strategy);
   }
 
@@ -89,6 +90,32 @@ public class RSelect {
   /* Helper interface PartitionStrategy */
   private static interface PartitionStrategy {
     public <T extends Comparable<T>> Pair partition(T[] a, int lo, int hi);
+  }
+  
+  /* Helper class TwowayPartition that implements 2-way variant partition */
+  private static class TwowayVariantPartition implements PartitionStrategy {
+    public <T extends Comparable<T>> Pair partition(T[] a, int lo, int hi) {
+      /* Maintain invariants:
+       * a[j+1..hi] >= pivot >= a[lo..i-1]
+       * a[j] <= pivot and lo <= j <= hi
+       */
+      int i = lo + 1;
+      int j = hi;
+      while (i <= j) {
+        //while (i <= j && less(a[lo], a[j])) {
+        while (less(a[lo], a[j])) { //'i <= j' is unnecessary since a[lo] is itself pivot
+          j--;
+        }
+        while (i <= j && less(a[i], a[lo])) {
+          i++;
+        }
+        if (i <= j) { //Finally i is greater than j for the loop to terminate
+          swap(a, i++, j--);
+        }
+      }
+      swap(a, lo, j);
+      return new Pair(j, j);
+    }
   }
   
   /* Helper class TwowayPartition that implements 2-way partition */

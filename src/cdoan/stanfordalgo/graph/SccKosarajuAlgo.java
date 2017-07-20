@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 /**
  * Programming assignment 1 of course 2.
- * Implement Kosaraju algorithm to compute Strongly Connected Components of directed graphs
+ * Implement Kosaraju algorithm to compute Strongly Connected Components (SCC) of directed graphs.
  */
 public class SccKosarajuAlgo {
 
@@ -67,6 +67,7 @@ public class SccKosarajuAlgo {
     return decreasingOrder;
   }
   
+  /* Create backward/incoming adjacency list from forward/outgoing adjacency list */
   private LinkedList<Integer>[] backwardAdjacencyList() {
     LinkedList<Integer>[] backAdj = new LinkedList[V];
     for (int i = 1; i < V; i++) {
@@ -191,7 +192,7 @@ public class SccKosarajuAlgo {
         sizesOf5LargestSccs.add(0);
       }
     }
-    System.out.println(sizesOf5LargestSccs);
+    System.out.println("The sizes of 5 largest SCCs:" + sizesOf5LargestSccs);
   }
   
   /* Utility method for test data */

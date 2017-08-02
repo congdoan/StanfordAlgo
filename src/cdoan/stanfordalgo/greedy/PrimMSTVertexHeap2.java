@@ -2,6 +2,7 @@ package cdoan.stanfordalgo.greedy;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.Scanner;
  * 
  * Implement the Prim's Minimum Spanning Tree algorithm using a Vertex-based Min Heap.
  */
-public class PrimMSTVertexHeap {
+public class PrimMSTVertexHeap2 {
   
   private static class NeighborCost implements Comparable<NeighborCost> {
     private int vertex;
@@ -41,44 +42,31 @@ public class PrimMSTVertexHeap {
     long sum = 0; // to hold the sum cost of the resulting Minimum Spanning Tree
     
     /* Initialize */
-    int s = 1; // arbitrary start vertex
-    HashSet<Integer> processedV = new HashSet<>(V); // hold those vertices processed
-    // Min heap to hold unprocessed vertices (adjacent to processed ones) 
-    // whose key is defined by a min-cost edge between it and a processed vertex
-    PriorityQueue<NeighborCost> unprocessedNeighbors = new PriorityQueue<>();
-    HashMap<Integer, NeighborCost> neighborsInPQ = new HashMap<>(V); // Hold those vertices added to the min heap
-    processedV.add(s); // mark s as processed    
-    for (NeighborCost sNeighbor: adj.get(s)) {
-      unprocessedNeighbors.offer(sNeighbor);     // add neighbors of s to the min heap
-      neighborsInPQ.put(sNeighbor.vertex, sNeighbor); // mark that this neighbor added to the heap
+    int s = 1;
+    HashSet<Integer> processedV = new HashSet<>(V);
+    ArrayList<NeighborCost> unprocessedV = new ArrayList<>(V - 1);
+    for (int v = 2; v <= V; v++) {
+      unprocessedV.add(new NeighborCost(v, Integer.MAX_VALUE));
     }
+    for (NeighborCost sNeighbor: adj.get(s)) {
+      unprocessedV.set(sNeighbor.vertex - 2, sNeighbor);
+    }
+    PriorityQueue<NeighborCost> unprocessedVMinPQ = new PriorityQueue<>(unprocessedV);
+    processedV.add(s);
     
     /* Main loop */
     while (processedV.size() < V) {
-      NeighborCost minNeighbor = unprocessedNeighbors.poll();
-      int v = minNeighbor.vertex;
-      int cost = minNeighbor.cost;
+      NeighborCost minCostNeighbor = unprocessedVMinPQ.poll();
+      int u = minCostNeighbor.vertex;
+      processedV.add(u);
+      int cost = minCostNeighbor.cost;
       sum += cost;
-      processedV.add(v);
-      //neighborsInPQ.remove(v);
-      for (NeighborCost vNeighbor: adj.get(v)) {
-        if (processedV.contains(vNeighbor.vertex)) {
-          continue;
-        }
-        NeighborCost vNeighborInPQ = neighborsInPQ.get(vNeighbor.vertex);
-        if (vNeighborInPQ != null) {
-          // This v's neighbor already in heap
-          if (vNeighbor.cost < vNeighborInPQ.cost) {
-            // Update unprocessedNeighbors replacing vNeighborInPQ with vNeighbor 
-            unprocessedNeighbors.remove(vNeighborInPQ);
-            unprocessedNeighbors.offer(vNeighbor);
-            // Update neighborsInPQ
-            neighborsInPQ.put(vNeighbor.vertex, vNeighbor);
-          }
-        } else {
-          // Add vNeighbor to unprocessedNeighbors & neighborsInPQ
-          unprocessedNeighbors.offer(vNeighbor);
-          neighborsInPQ.put(vNeighbor.vertex, vNeighbor);
+      for (NeighborCost neighbor: adj.get(u)) {
+        int v = neighbor.vertex;
+        if (!processedV.contains(v) && neighbor.cost < unprocessedV.get(v - 2).cost) {
+          unprocessedVMinPQ.remove(unprocessedV.get(v - 2));
+          unprocessedVMinPQ.offer(neighbor);
+          unprocessedV.set(v - 2, neighbor);
         }
       }
     }
